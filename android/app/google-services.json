@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "92537378635",
+    "project_id": "coatschat",
+    "storage_bucket": "coatschat.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:92537378635:android:eb7c5a00f3c0526aca7ace",
+        "android_client_info": {
+          "package_name": "com.coatschat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBuL2FzfpImBbIaRrU0TEH_WCcKXnUK9hA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
