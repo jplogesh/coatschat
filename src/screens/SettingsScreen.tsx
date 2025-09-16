@@ -108,43 +108,43 @@ const uploadImageAndGetUrl = async (asset: Asset): Promise<string> => {
     contentType: asset.type || 'image/jpeg',
   };
 
-  return new Promise<string>((resolve, reject) => {
-    setUploading(true);
-    setProgress(0);
+return new Promise<string>((resolve, reject) => {
+  setUploading(true);
+  setProgress(0);
 
-    const uploadTask = uploadBytesResumable(sRef, blob, metadata);
+  const uploadTask = uploadBytesResumable(sRef, blob, metadata);
 
-    uploadTask.on(
-      'state_changed',
-      snapshot => {
-        const pct = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        setProgress(Math.round(pct));
-      },
-      error => {
-        setUploading(false);
-        setProgress(0);
+  uploadTask.on(
+    'state_changed',
+    snapshot => {
+      const pct = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      setProgress(Math.round(pct));
+    },
+    error => {
+      setUploading(false);
+      setProgress(0);
         // log full error object for debugging
-        console.error('[upload] uploadTask error', error, {
+      console.error('[upload] uploadTask error', error, {
           code: (error && error.code) || null,
           message: (error && error.message) || null,
-        });
-        reject(error);
-      },
-      async () => {
-        try {
-          const url = await getDownloadURL(uploadTask.snapshot.ref);
-          setUploading(false);
-          setProgress(100);
-          resolve(url);
-        } catch (e) {
-          setUploading(false);
-          setProgress(0);
-          console.error('[upload] getDownloadURL failed', e);
-          reject(e);
-        }
-      },
-    );
-  });
+      });
+      reject(error);
+    },
+    async () => {
+      try {
+        const url = await getDownloadURL(uploadTask.snapshot.ref);
+        setUploading(false);
+        setProgress(100);
+        resolve(url);
+      } catch (e) {
+        setUploading(false);
+        setProgress(0);
+        console.error('[upload] getDownloadURL failed', e);
+        reject(e);
+      }
+    },
+  );
+});
 };
 
 
@@ -274,7 +274,7 @@ const openCamera = async() => {
             ) : (
               <View className="w-28 h-28 rounded-full bg-slate-100 items-center justify-center">
                 <Text className="text-xl font-bold text-slate-700">
-                  {(user?.displayName || 'U').split(' ').map(s => s[0]).slice(0,2).join('').toLocaleUpperCase()}                </Text>
+                  {(user?.displayName || 'U').split(' ').map(s => s[0]).slice(0,2).join('').toLocaleUpperCase()}</Text>
               </View>
             )}
 
