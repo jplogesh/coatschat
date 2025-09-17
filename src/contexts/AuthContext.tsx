@@ -18,12 +18,13 @@ type MinimalUser = {
   email?: string | null;
   displayName?: string | null;
   photoURL?: string | null;
+  location?: string | null;
 } | null;
 
 type AuthContextType = {
   user: MinimalUser;
   loading: boolean;
-  signUp: (email: string, password: string, displayName?: string) => Promise<void>;
+  signUp: (email: string, password: string, displayName?: string, location?: string) => Promise<void>;
   signIn: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
 };
@@ -35,7 +36,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
  * - ensures a users/{uid} doc exists with basic profile fields
  * - uses merge writes so presence/online doesn't clobber profile
  */
-const createOrUpdateUserDoc = async (u: FirebaseUser | null, displayNameOverride?: string) => {
+const createOrUpdateUserDoc = async (u: FirebaseUser | null, displayNameOverride?: string, location?: string) => {
   if (!u?.uid) return;
   const userRef = doc(db, 'users', u.uid);
   try {
@@ -46,6 +47,7 @@ const createOrUpdateUserDoc = async (u: FirebaseUser | null, displayNameOverride
       displayName,
       displayNameLower: (displayName ?? '').toLowerCase(),
       photoURL: u.photoURL ?? null,
+      location: location || null,
       updatedAt: serverTimestamp(),
     };
     // merge:true - safe to call even if doc already exists
@@ -77,7 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           };
           setUser(minimal);
           setLoading(false);
-
           // Ensure Firestore user doc exists / updated
           try {
             await createOrUpdateUserDoc(u);
@@ -138,7 +139,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [appState]);
 
   // signUp: create auth user, update auth profile, then create user doc + mark online
-  const signUp = async (email: string, password: string, displayName?: string) => {
+  const signUp = async (email: string, password: string, displayName?: string, location?: string) => {
     setLoading(true);
     try {
       const cred = await createUserWithEmailAndPassword(auth, email, password);
@@ -154,11 +155,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // create or update Firestore user doc (merge true)
       try {
-        await createOrUpdateUserDoc(cred.user, displayName);
+        await createOrUpdateUserDoc(cred.user, displayName, location);
       } catch (e) {
         console.warn('[Auth] createOrUpdateUserDoc after signUp failed', e);
       }
-
+  // Refresh local user state so UI updates immediately
+    await refreshUser();
       // mark presence online
       try {
         await markUserOnline(cred.user.uid);
@@ -227,6 +229,19 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       throw e;
     }
   };
+
+  const refreshUser = async () => {
+  const u = auth.currentUser;
+  if (u) {
+    await u.reload();
+    setUser({
+      uid: u.uid,
+      email: u.email,
+      displayName: u.displayName ?? null,
+      photoURL: u.photoURL ?? null,
+    });
+  }
+};
 
   const value = useMemo(
     () => ({

@@ -29,7 +29,7 @@ const HeaderWithSearchInline = ({ query, setQuery }: { query: string; setQuery: 
   const [open, setOpen] = useState(false);
   return (
     <View className="bg-white border-b border-slate-200 px-4 py-3">
-      <View className="flex-row items-center">
+      <View className="flex-row items-center justify-between">
         {open ? (
           <TextInput
             value={query}
@@ -41,11 +41,11 @@ const HeaderWithSearchInline = ({ query, setQuery }: { query: string; setQuery: 
         ) : (
           <View className='flex-row items-center gap-2'>
    <MessageCircle size={20} className="text-blue-600 mr-2" />
-          <Text className="flex-1 text-lg font-semibold text-black">CoatsChat</Text>
+          <Text className=" text-lg font-semibold text-black">CoatsChat</Text>
      </View>  
         )}
         <TouchableOpacity onPress={() => (open ? (setQuery(''), setOpen(false)) : setOpen(true))} className="p-2 ml-2">
-        {open ? <LucideSearch size={18} /> :  <Text className="text-slate-700">X</Text>}
+        {open ? <Text className="text-slate-700">X</Text> : <LucideSearch size={18} />}
         </TouchableOpacity>
       </View>
     </View>
@@ -189,6 +189,7 @@ const UsersListScreen: React.FC<any> = ({ navigation }) => {
       ) : (
         <FlatList
           data={results}
+        
           keyExtractor={i => i.id}
           renderItem={renderItem}
           contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}

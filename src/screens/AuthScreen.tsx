@@ -10,7 +10,7 @@ import {
   Platform,
   StyleSheet,
 } from 'react-native';
-import { User, Mail, Lock, MessageCircle } from 'lucide-react-native';
+import { User, Mail, Lock, MessageCircle, LocateIcon } from 'lucide-react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { showToast } from '../utils/toast';
 
@@ -20,6 +20,7 @@ const AuthScreen: React.FC<Props> = ({ navigation: _navigation }) => {
   const [email, setEmail] = useState('');
   const [pass, setPass] = useState('');
   const [name, setName] = useState('');
+  const [location, setLocation] = useState('');
   const [isLogin, setIsLogin] = useState(true);
   const { signUp, signIn } = useAuth();
 
@@ -37,8 +38,12 @@ const AuthScreen: React.FC<Props> = ({ navigation: _navigation }) => {
       showToast('Please enter a valid email address.');
       return;
     }
+    if(!location){
+      showToast('Location is required.');
+      return;
+    }
     try {
-      await signUp(email, pass, name);
+      await signUp(email, pass, name, location);
     } catch (e: any) {
       showToast( e.message);
     }
@@ -148,6 +153,19 @@ const AuthScreen: React.FC<Props> = ({ navigation: _navigation }) => {
                       placeholder="Full name"
                       value={name}
                       onChangeText={setName}
+                      className="flex-1 py-3 text-gray-900"
+                      placeholderTextColor="#9AA3B2"
+                    />
+                  </View>
+                  <Text className="text-sm text-gray-700 mb-2 mt-4">Location</Text>
+                  <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-lg">
+                    <View className="px-3">
+                      <LocateIcon width={18} height={18} color="#9AA3B2" />
+                    </View>
+                    <TextInput
+                      placeholder="Enter your location"
+                      value={location}
+                      onChangeText={setLocation}
                       className="flex-1 py-3 text-gray-900"
                       placeholderTextColor="#9AA3B2"
                     />
