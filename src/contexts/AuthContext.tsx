@@ -12,6 +12,8 @@ import {
 import { auth, db } from '../../firebase'; // <- ensure firebase.ts exports auth and db
 import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 import { markUserOnline, markUserOffline } from '../utils/presenceHelpers';
+import { initNotifications, getAndSaveToken, removeTokenFromFirestore } from '../notifications';
+import messaging from '@react-native-firebase/messaging';
 
 type MinimalUser = {
   uid: string;
@@ -82,6 +84,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Ensure Firestore user doc exists / updated
           try {
             await createOrUpdateUserDoc(u);
+               const userId = u.uid;
+               await initNotifications(userId);
           } catch (e) {
             console.warn('[Auth] createOrUpdateUserDoc in onAuthStateChanged failed', e);
           }
@@ -195,7 +199,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       } catch (e) {
         console.warn('[Auth] ensure user doc on signIn failed', e);
       }
-
+      const userId = u.uid;
+      await initNotifications(userId);
       // mark presence online
       try {
         await markUserOnline(u.uid);
@@ -223,6 +228,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     try {
       await firebaseSignOut(auth);
+      const token = await messaging().getToken();
+      await removeTokenFromFirestore(uid, token);
       setUser(null);
     } catch (e) {
       console.warn('[Auth] firebaseSignOut failed', e);

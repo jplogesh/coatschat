@@ -75,3 +75,31 @@ yarn-error.log
 !.yarn/versions
 yarn.lock
 android/gradlew
+
+# Firebase credentials
+android/app/google-services.json
+ios/Runner/GoogleService-Info.plist
+
+# Env files
+.env
+.env.*
+
+# Android/iOS build
+android/app/build/
+ios/build/
+
+# Node modules
+node_modules/
+
+# Keys
+*.keystore
+*.jks
+android/key.properties
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# Logs
+*.log
